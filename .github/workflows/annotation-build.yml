@@ -1,0 +1,31 @@
+name: Build annotation
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          cache: 'gradle'
+
+      - name : Build and Publish API with Gradle
+        run: |
+          echo "::group::Build annotation"
+          ./gradlew build
+          echo "::endgroup::"
+          echo "::group::Publish annotation to Maven Repository"
+          ./gradlew publishAllPublicationsToMavenRepository
+          echo "::endgroup::"
+        env:
+          DEPLOY_ID: ${{ secrets.DEPLOY_ID }}
+          DEPLOY_PW: ${{ secrets.DEPLOY_PW }}
